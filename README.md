@@ -5,7 +5,7 @@ A B-Tree key-value store library built as a learning project. Implements a B-Tre
 ## Installation
 
 ```bash
-go get github.com/Sohaib-Fares/btree
+go get github.com/red7-c/btree
 ```
 
 ## Quick Start
@@ -15,7 +15,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/Sohaib-Fares/btree/pkg"
+	"github.com/red7-c/btree/pkg"
 )
 
 func main() {
