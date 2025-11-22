@@ -1,5 +1,4 @@
-package pkg
-
+package btree
 import (
 	"bytes"
 	"testing"

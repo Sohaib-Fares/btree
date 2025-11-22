@@ -1,3 +1,3 @@
-module github.com/Sohaib-Fares/btree
+module github.com/red7-c/btree
 
-go 1.24.8
+go 1.24

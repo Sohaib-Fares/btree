@@ -1,16 +1,15 @@
-package tests
+package btree
 
 import (
 	"bytes"
 	"fmt"
 	"testing"
 
-	"github.com/Sohaib-Fares/btree/pkg"
 )
 
 // TestBTreeInsertAndFind tests basic insertion and retrieval
 func TestBTreeInsertAndFind(t *testing.T) {
-	tree := pkg.NewBtree()
+	tree := NewBtree()
 
 	// Table-driven test: define test cases in a slice
 	testCases := []struct {
@@ -47,7 +46,7 @@ func TestBTreeInsertAndFind(t *testing.T) {
 
 // TestBTreeFindNonExistent tests finding keys that don't exist
 func TestBTreeFindNonExistent(t *testing.T) {
-	tree := pkg.NewBtree()
+	tree := NewBtree()
 	tree.Insert([]byte("exists"), []byte("value"))
 
 	testCases := []struct {
@@ -71,7 +70,7 @@ func TestBTreeFindNonExistent(t *testing.T) {
 
 // TestBTreeInsertDuplicate tests inserting duplicate keys (should update)
 func TestBTreeInsertDuplicate(t *testing.T) {
-	tree := pkg.NewBtree()
+	tree := NewBtree()
 
 	key := []byte("duplicate")
 	tree.Insert(key, []byte("first"))
@@ -88,7 +87,7 @@ func TestBTreeInsertDuplicate(t *testing.T) {
 
 // TestBTreeLargeInsertion tests inserting many items to trigger splits
 func TestBTreeLargeInsertion(t *testing.T) {
-	tree := pkg.NewBtree()
+	tree := NewBtree()
 	numItems := 100
 
 	// Insert many items
@@ -115,7 +114,7 @@ func TestBTreeLargeInsertion(t *testing.T) {
 
 // TestBTreeDelete tests deletion of keys
 func TestBTreeDelete(t *testing.T) {
-	tree := pkg.NewBtree()
+	tree := NewBtree()
 
 	// Insert test data
 	keys := [][]byte{
@@ -160,7 +159,7 @@ func TestBTreeDelete(t *testing.T) {
 
 // TestBTreeDeleteFromEmpty tests deleting from empty tree
 func TestBTreeDeleteFromEmpty(t *testing.T) {
-	tree := pkg.NewBtree()
+	tree := NewBtree()
 
 	deleted := tree.Delete([]byte("anything"))
 	if deleted {
@@ -170,7 +169,7 @@ func TestBTreeDeleteFromEmpty(t *testing.T) {
 
 // TestBTreeDeleteAll tests deleting all items
 func TestBTreeDeleteAll(t *testing.T) {
-	tree := pkg.NewBtree()
+	tree := NewBtree()
 
 	// Insert items
 	keys := [][]byte{
@@ -201,7 +200,7 @@ func TestBTreeDeleteAll(t *testing.T) {
 
 // TestBTreeStressTest tests mixed operations
 func TestBTreeStressTest(t *testing.T) {
-	tree := pkg.NewBtree()
+	tree := NewBtree()
 
 	// Insert 50 items
 	for i := 0; i < 50; i++ {
