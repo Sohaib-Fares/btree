@@ -1,3 +1,3 @@
 module github.com/Sohaib-Fares/btree
 
-go 1.24.10
+go 1.24.8
