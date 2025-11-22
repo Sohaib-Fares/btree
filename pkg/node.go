@@ -117,3 +117,110 @@ func (n *node) insert(item *item) bool {
 
 	return n.children[pos].insert(item)
 }
+
+func (n *node) removeItemAt(pos int) *item {
+	removedItem := n.items[pos]
+	n.items[pos] = nil
+
+	if lastPos := n.nbrItems - 1; pos < lastPos {
+		copy(n.items[pos:lastPos], n.items[pos+1:lastPos+1])
+		n.items[lastPos] = nil
+	}
+	n.nbrItems--
+
+	return removedItem
+}
+
+func (n *node) removeChildAt(pos int) *node {
+	removedCHild := n.children[pos]
+	n.children[pos] = nil
+
+	if lastPos := n.nbrChildren - 1; pos < lastPos {
+		copy(n.items[pos:lastPos], n.items[pos+1:lastPos+1])
+		n.items[lastPos] = nil
+	}
+	n.nbrChildren--
+
+	return removedCHild
+}
+
+func (n *node) fillChildAt(pos int) {
+
+	switch {
+
+	case pos > 0 && n.children[pos-1].nbrItems > minItems:
+
+		left, right := n.children[pos-1], n.children[pos]
+		copy(right.items[1:n.nbrChildren+1], right.items[:right.nbrChildren])
+		right.items[0] = n.items[pos-1]
+		n.nbrItems++
+		if !left.isLeaf() {
+			right.insertChildAt(0, left.removeChildAt(left.nbrChildren-1))
+		}
+		n.items[pos-1] = left.removeItemAt(left.nbrItems - 1)
+
+	case pos < n.nbrChildren-1 && n.children[pos+1].nbrItems > minItems:
+
+		left, right := n.children[pos], n.children[pos+1]
+		left.items[left.nbrItems] = n.items[pos]
+		left.nbrItems++
+		if !right.isLeaf() {
+			left.insertChildAt(left.nbrChildren, right.removeChildAt(0))
+		}
+		n.items[pos] = right.removeItemAt(0)
+
+	default:
+
+		if pos >= n.nbrItems {
+			pos = n.nbrItems - 1
+		}
+
+		left, right := n.children[pos], n.children[pos+1]
+		left.items[left.nbrItems] = n.removeItemAt(pos)
+		left.nbrItems++
+		copy(left.items[left.nbrItems:], right.items[:right.nbrItems])
+		left.nbrItems += right.nbrItems
+		if !left.isLeaf() {
+			copy(left.children[left.nbrChildren:], right.children[:right.nbrChildren])
+			left.nbrChildren += right.nbrChildren
+		}
+		n.removeChildAt(pos + 1)
+		right = nil
+	}
+}
+
+func (n *node) delete(key []byte, isSeekingSuccessor bool) *item {
+	pos, found := n.Search(key)
+
+	var next *node
+
+	if found {
+		if n.isLeaf() {
+			return n.removeItemAt(pos)
+		}
+		next, isSeekingSuccessor = n.children[pos+1], true
+	} else {
+		next = n.children[pos]
+	}
+	if n.isLeaf() && isSeekingSuccessor {
+		return n.removeItemAt(0)
+	}
+	if next == nil {
+		return nil
+	}
+
+	deletedItem := next.delete(key, isSeekingSuccessor)
+
+	if found && isSeekingSuccessor {
+		n.items[pos] = deletedItem
+	}
+
+	if next.nbrItems < minItems {
+		if found && isSeekingSuccessor {
+			n.fillChildAt(pos + 1)
+		} else {
+			n.fillChildAt(pos)
+		}
+	}
+	return deletedItem
+}

@@ -51,3 +51,24 @@ func (t *BTree) Insert(key, val []byte) {
 	t.root.insert(i)
 
 }
+
+func (t *BTree) Delete(key []byte) bool {
+
+	if t.root == nil {
+		return false
+	}
+	
+	deletedItem := t.root.delete(key, false)
+
+	if t.root.nbrItems == 0 {
+		if t.root.isLeaf() {
+			t.root = nil
+		} else {
+			t.root = t.root.children[0]
+		}
+	}
+	if deletedItem != nil {
+		return true
+	}
+	return false
+}
