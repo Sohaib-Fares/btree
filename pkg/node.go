@@ -41,7 +41,7 @@ func (n *node) Search(key []byte) (int, bool) {
 }
 
 func (n *node) insertItemAt(pos int, i *item) {
-	if pos > n.nbrItems {
+	if pos <= n.nbrItems {
 		copy(n.items[pos+1:n.nbrItems+1], n.items[pos:n.nbrItems])
 		n.items[pos] = i
 		n.nbrItems++
@@ -49,8 +49,8 @@ func (n *node) insertItemAt(pos int, i *item) {
 }
 
 func (n *node) insertChildAt(pos int, c *node) {
-	if pos > c.nbrChildren {
-		copy(n.items[pos+1:n.nbrChildren+1], n.items[pos:n.nbrChildren])
+	if pos <= n.nbrChildren {
+		copy(n.children[pos+1:n.nbrChildren+1], n.children[pos:n.nbrChildren])
 	}
 	n.children[pos] = c
 	n.nbrChildren++
@@ -103,13 +103,14 @@ func (n *node) insert(item *item) bool {
 
 		switch cmp := bytes.Compare(item.key, n.items[pos].key); {
 		case cmp < 0:
-
+			// do nothing, keep the same path
 		case cmp > 0:
 			pos++
 
 		case cmp == 0:
+
 			n.items[pos] = item
-			return true
+			return false // This is an update, not a new insertion so we return false
 
 		}
 
@@ -136,8 +137,8 @@ func (n *node) removeChildAt(pos int) *node {
 	n.children[pos] = nil
 
 	if lastPos := n.nbrChildren - 1; pos < lastPos {
-		copy(n.items[pos:lastPos], n.items[pos+1:lastPos+1])
-		n.items[lastPos] = nil
+		copy(n.children[pos:lastPos], n.children[pos+1:lastPos+1])
+		n.children[lastPos] = nil
 	}
 	n.nbrChildren--
 
@@ -151,9 +152,9 @@ func (n *node) fillChildAt(pos int) {
 	case pos > 0 && n.children[pos-1].nbrItems > minItems:
 
 		left, right := n.children[pos-1], n.children[pos]
-		copy(right.items[1:n.nbrChildren+1], right.items[:right.nbrChildren])
+		copy(right.items[1:right.nbrItems+1], right.items[:right.nbrItems])
 		right.items[0] = n.items[pos-1]
-		n.nbrItems++
+		right.nbrItems++
 		if !left.isLeaf() {
 			right.insertChildAt(0, left.removeChildAt(left.nbrChildren-1))
 		}
