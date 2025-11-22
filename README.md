@@ -15,7 +15,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/red7-c/btree/pkg"
+	"github.com/red7-c/btree"
 )
 
 func main() {
