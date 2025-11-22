@@ -27,3 +27,27 @@ func (t *BTree) Find(key []byte) ([]byte, error) {
 	}
 	return nil, errors.New("key not found")
 }
+
+func (t *BTree) splitRoot() {
+	newRoot := &node{}
+	midItem, newNode := t.root.Split()
+	newRoot.insertItemAt(0, midItem)
+	newRoot.insertChildAt(0, t.root)
+	newRoot.insertChildAt(1, newNode)
+	t.root = newRoot
+}
+
+func (t *BTree) Insert(key, val []byte) {
+	i := &item{key, val}
+
+	if t.root == nil {
+		t.root = &node{}
+	}
+
+	if t.root.nbrItems >= maxItems {
+		t.splitRoot()
+	}
+
+	t.root.insert(i)
+
+}

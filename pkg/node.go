@@ -1,6 +1,8 @@
 package pkg
 
-import "bytes"
+import (
+	"bytes"
+)
 
 type item struct {
 	key []byte
@@ -59,11 +61,11 @@ func (n *node) Split() (*item, *node) {
 	midItem := n.items[mid]
 
 	newNode := &node{}
-	copy(newNode.items[:], n.items[mid+1:])
+	newNode.nbrItems = copy(newNode.items[:], n.items[mid+1:])
 
 	if !n.isLeaf() {
 		copy(newNode.children[:], n.children[mid+1:])
-		newNode.nbrChildren = minItems + 1
+		newNode.nbrChildren = newNode.nbrItems + 1
 	}
 
 	for i, l := mid, n.nbrItems; i < l; i++ {
@@ -76,4 +78,42 @@ func (n *node) Split() (*item, *node) {
 		}
 	}
 	return midItem, newNode
+}
+
+func (n *node) insert(item *item) bool {
+
+	pos, found := n.Search(item.key)
+
+	if found {
+		n.items[pos] = item
+		return false
+	}
+
+	if n.isLeaf() {
+		n.insertItemAt(pos, item)
+		return true
+	}
+
+	if n.children[pos].nbrItems >= maxItems {
+
+		midItem, newNode := n.children[pos].Split()
+
+		n.insertItemAt(pos, midItem)
+		n.insertChildAt(pos+1, newNode)
+
+		switch cmp := bytes.Compare(item.key, n.items[pos].key); {
+		case cmp < 0:
+
+		case cmp > 0:
+			pos++
+
+		case cmp == 0:
+			n.items[pos] = item
+			return true
+
+		}
+
+	}
+
+	return n.children[pos].insert(item)
 }
